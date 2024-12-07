@@ -100,9 +100,9 @@ const DMListPage = async ({
     for (const [key, value] of Object.entries(queryParams)) {
       if (value !== undefined) {
         switch (key) {
-          case "batchId":
-            query.batches = { equals: parseInt(value) };
-            break;
+          // case "batchId":
+          //   query.batches = { equals: parseInt(value) };
+          //   break;
           case "search":
             query.name = { contains: value, mode: "insensitive" }; // Adjust field for DM name
             break;
