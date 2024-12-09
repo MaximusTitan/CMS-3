@@ -39,7 +39,7 @@ const AnnouncementListPage = async ({
       accessor: "date",
       className: "hidden md:table-cell",
     },
-    ...(role === "admin" || role === "delivery_manager"
+    ...((role === "admin" || role === "delivery_manager")
       ? [
           {
             header: "Actions",
@@ -63,12 +63,14 @@ const AnnouncementListPage = async ({
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" || role === "delivery_manager" && (
-            <>
-              <FormContainer table="announcement" type="update" data={item} />
-              <FormContainer table="announcement" type="delete" id={item.id} />
-            </>
-          )}
+        {(role === "admin" || role === "delivery_manager") && (
+  <>
+    <FormContainer table="announcement" type="update" data={item} />
+    <FormContainer table="announcement" type="delete" id={item.id} />
+  </>
+)}
+
+          
         </div>
       </td>
     </tr>

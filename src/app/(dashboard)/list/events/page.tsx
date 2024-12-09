@@ -44,7 +44,7 @@ const EventListPage = async ({
       accessor: "endTime",
       className: "hidden md:table-cell",
     },
-    ...(role === "admin" || role === "delivery_manager"
+    ...((role === "admin" || role === "delivery_manager")
       ? [
           {
             header: "Actions",
@@ -81,7 +81,7 @@ const EventListPage = async ({
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" || role === "delivery_manager" && (
+          {(role === "admin" || role === "delivery_manager") && (
             <>
               <FormContainer table="event" type="update" data={item} />
               <FormContainer table="event" type="delete" id={item.id} />

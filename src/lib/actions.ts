@@ -83,41 +83,70 @@ export const deleteSubject = async (
 
 export const createBatch = async (
   currentState: CurrentState,
-  data: BatchSchema
+  data: BatchSchema & { assistantLecturerIds?: string[] }
 ) => {
   try {
-    await prisma.batch.create({
-      data,
+    const { assistantLecturerIds, ...batchData } = data;
+
+    const batch = await prisma.batch.create({
+      data: {
+        ...batchData,
+        assistantLecturers: assistantLecturerIds 
+          ? {
+              connect: assistantLecturerIds.map(id => ({ id }))
+            }
+          : undefined,
+      },
     });
 
     // revalidatePath("/list/class");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { success: false, error: true };
   }
 };
+
 
 export const updateBatch = async (
   currentState: CurrentState,
-  data: BatchSchema
+  data: BatchSchema & { assistantLecturerIds?: string[] }
 ) => {
   try {
-    await prisma.batch.update({
+    const { assistantLecturerIds, ...batchData } = data;
+
+    const batch = await prisma.batch.update({
       where: {
-        id: data.id,
+        id: batchData.id,
       },
-      data,
+      data: {
+        ...batchData,
+        assistantLecturers: {
+          // Disconnect all current assistant lecturers
+          disconnect: await prisma.batch
+            .findUnique({ 
+              where: { id: batchData.id }, 
+              select: { assistantLecturers: { select: { id: true } } } 
+            })
+            .then(result => result?.assistantLecturers || []),
+          
+          // Connect new assistant lecturers if provided
+          connect: assistantLecturerIds 
+            ? assistantLecturerIds.map(id => ({ id }))
+            : undefined,
+        },
+      },
     });
 
     // revalidatePath("/list/class");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { success: false, error: true };
   }
 };
 
+// Keep other existing actions the same...
 export const deleteBatch = async (
   currentState: CurrentState,
   data: FormData
@@ -133,10 +162,11 @@ export const deleteBatch = async (
     // revalidatePath("/list/class");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { success: false, error: true };
   }
 };
+
 
 export const createTeacher = async (
   currentState: CurrentState,

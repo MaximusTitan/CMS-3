@@ -14,10 +14,12 @@ export const batchSchema = z.object({
   capacity: z.coerce.number().min(1, { message: "Capacity is required!" }),
   gradeId: z.coerce.number().min(1, { message: "Grade is required!" }),
   supervisorId: z.coerce.string().optional(),
+  assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
   dmId: z.string().optional(), // Delivery Manager ID (optional)
 });
 
 export type BatchSchema = z.infer<typeof batchSchema>;
+
 
 export const teacherSchema = z.object({
   id: z.string().optional(),

@@ -46,7 +46,7 @@ const StudentListPage = async ({
       accessor: "address",
       className: "hidden lg:table-cell",
     },
-    ...(role === "admin" || role === "delivery_manager"
+    ...((role === "admin" || role === "delivery_manager")
       ? [
           {
             header: "Actions",
@@ -86,7 +86,7 @@ const StudentListPage = async ({
               <Image src="/view.png" alt="" width={16} height={16} />
             </button>
           </Link>
-          {role === "admin" || role === "delivery_manager" && (
+          {(role === "admin" || role === "delivery_manager") && (
             // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
             //   <Image src="/delete.png" alt="" width={16} height={16} />
             // </button>

@@ -42,7 +42,7 @@ const DMListPage = async ({
       accessor: "email",
       className: "hidden lg:table-cell",
     },
-    ...(role === "delivery_manager"
+    ...(role === "admin"
       ? [
           {
             header: "Actions",
@@ -72,7 +72,7 @@ const DMListPage = async ({
       </td>
       <td className="hidden md:table-cell">{item.username}</td> {/* Update username */}
       <td className="hidden md:table-cell">{item.phone}</td>
-      <td className="hidden md:table-cell">{item.batches.id}</td>
+      <td className="hidden md:table-cell">{item.email}</td>
       <td>
         <div className="flex items-center gap-2">
           <Link href={`/list/dm/${item.id}`}>

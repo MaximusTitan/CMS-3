@@ -51,6 +51,9 @@ model Teacher {
   lessons   Lesson[]
   batches   Batch[]
   birthday  DateTime
+
+  // New field for assistant lecturer batches
+  assistantBatches Batch[] @relation("BatchAssistantLecturers")
 }
 
 model Grade {
@@ -66,16 +69,18 @@ model Batch {
   name     String @unique
   capacity Int
 
-  supervisorId  String?
-  supervisor    Teacher?       @relation(fields: [supervisorId], references: [id])
-  lessons       Lesson[]
-  students      Student[]
-  gradeId       Int
-  grade         Grade          @relation(fields: [gradeId], references: [id])
-  events        Event[]
-  announcements Announcement[]
-  DM            DM?            @relation(fields: [dMId], references: [id])
-  dMId          String?
+  // New fields for assistant lecturers
+  assistantLecturers Teacher[]      @relation("BatchAssistantLecturers")
+  supervisorId       String?
+  supervisor         Teacher?       @relation(fields: [supervisorId], references: [id])
+  lessons            Lesson[]
+  students           Student[]
+  events             Event[]
+  announcements      Announcement[]
+  DM                 DM?            @relation(fields: [dMId], references: [id])
+  dMId               String?
+  Grade              Grade?         @relation(fields: [gradeId], references: [id])
+  gradeId            Int?
 }
 
 model Subject {

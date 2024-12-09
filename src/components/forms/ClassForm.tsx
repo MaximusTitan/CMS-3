@@ -6,19 +6,16 @@ import InputField from "../InputField";
 import {
   batchSchema,
   BatchSchema,
-  subjectSchema,
-  SubjectSchema,
 } from "@/lib/formValidationSchemas";
 import {
   createBatch,
-  createSubject,
   updateBatch,
-  updateSubject,
 } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import * as z from "zod";
 
 const ClassForm = ({
   type,
@@ -31,15 +28,20 @@ const ClassForm = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
   relatedData?: any;
 }) => {
+  // Modify the Zod schema to support one supervisor and multiple assistant lecturers
+  const modifiedBatchSchema = batchSchema.extend({
+    supervisorId: z.string().optional(),
+    assistantLecturerIds: z.array(z.string()).optional(),
+  });
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<BatchSchema>({
-    resolver: zodResolver(batchSchema),
+  } = useForm<z.infer<typeof modifiedBatchSchema>>({
+    resolver: zodResolver(modifiedBatchSchema),
   });
-
-  // AFTER REACT 19 IT'LL BE USEACTIONSTATE
 
   const [state, formAction] = useFormState(
     type === "create" ? createBatch : updateBatch,
@@ -97,32 +99,56 @@ const ClassForm = ({
             hidden
           />
         )}
+        
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-  <label className="text-xs text-gray-500">Supervisors</label>
-  <div className="flex flex-col gap-1">
-    {teachers.map(
-      (teacher: { id: string; name: string; surname: string }) => (
-        <label key={teacher.id} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            value={teacher.id}
+          <label className="text-xs text-gray-500">Supervisor</label>
+          <select
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("supervisorId")}
-            defaultChecked={data?.supervisors?.includes(teacher.id)}
-            className="ring-[1.5px] ring-gray-300 rounded-sm"
-          />
-          <span className="text-sm text-gray-700">
-            {teacher.name + " " + teacher.surname}
-          </span>
-        </label>
-      )
-    )}
-  </div>
-  {errors.supervisorId?.message && (
-    <p className="text-xs text-red-400">
-      {errors.supervisorId.message.toString()}
-    </p>
-  )}
-</div>
+            defaultValue={data?.supervisorId}
+          >
+            <option value="">Select Supervisor</option>
+            {teachers.map(
+              (teacher: { id: string; name: string; surname: string }) => (
+                <option key={teacher.id} value={teacher.id}>
+                  {teacher.name + " " + teacher.surname}
+                </option>
+              )
+            )}
+          </select>
+          {errors.supervisorId?.message && (
+            <p className="text-xs text-red-400">
+              {errors.supervisorId.message.toString()}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label className="text-xs text-gray-500">Assistant Lecturers</label>
+          <div className="flex flex-col gap-1">
+            {teachers.map(
+              (teacher: { id: string; name: string; surname: string }) => (
+                <label key={teacher.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={teacher.id}
+                    {...register("assistantLecturerIds")}
+                    defaultChecked={data?.assistantLecturers?.includes(teacher.id)}
+                    className="ring-[1.5px] ring-gray-300 rounded-sm"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {teacher.name + " " + teacher.surname}
+                  </span>
+                </label>
+              )
+            )}
+          </div>
+          {errors.assistantLecturerIds?.message && (
+            <p className="text-xs text-red-400">
+              {errors.assistantLecturerIds.message.toString()}
+            </p>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label className="text-xs text-gray-500">Grade</label>
@@ -147,8 +173,8 @@ const ClassForm = ({
             </p>
           )}
         </div>
-
       </div>
+
       {state.error && (
         <span className="text-red-500">Something went wrong!</span>
       )}
