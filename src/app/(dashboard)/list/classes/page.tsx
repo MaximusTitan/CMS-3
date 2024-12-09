@@ -11,7 +11,11 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { assignmentsData } from "@/lib/data";
 
-type BatchList = Batch & { supervisor: Teacher };
+type BatchList = Batch & { 
+  supervisor: Teacher 
+} & { 
+  assistantLecturers: Teacher[] 
+};
 
 const BatchListPage = async ({
   searchParams,
@@ -68,7 +72,9 @@ const renderRow = (item: BatchList) => (
       {item.supervisor.name + " " + item.supervisor.surname}
     </td>
     <td className="hidden md:table-cell">
-  {item.assistantLecturers.map(assistant => `${assistant.name} ${assistant.surname}`).join(", ") || "No assistants"}
+  {item.assistantLecturers.length > 0 
+    ? item.assistantLecturers.map(assistant => `${assistant.name} ${assistant.surname}`).join(", ")
+    : "No assistants"}
 </td>
     <td>
       <div className="flex items-center gap-2">
@@ -119,7 +125,7 @@ const renderRow = (item: BatchList) => (
       where: query,
       include: {
         supervisor: true,
-        assistantLecturers: true, // Add this line
+        assistantLecturers: true, // Ensure this matches the schema
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
