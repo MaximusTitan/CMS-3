@@ -12,7 +12,7 @@ const BigCalendar = ({
 }: {
   data: { title: string; start: Date; end: Date }[];
 }) => {
-  const [view, setView] = useState<View>(Views.WORK_WEEK);
+  const [view, setView] = useState<View>(Views.DAY);
 
   const handleOnChangeView = (selectedView: View) => {
     setView(selectedView);
@@ -24,7 +24,7 @@ const BigCalendar = ({
       events={data}
       startAccessor="start"
       endAccessor="end"
-      views={["work_week", "day"]}
+      views={[ "day","week"]}
       view={view}
       style={{ height: "98%" }}
       onView={handleOnChangeView}

@@ -54,6 +54,12 @@ const menuItems = [
         href: "/list/announcements",
         visible: ["admin", "teacher", "student", "delivery_manager"],
       },
+      {
+        icon: "/lesson.png",
+        label: "Lessons",
+        href: "/list/lessons",
+        visible: ["admin", "delivery_manager"],
+      },
     ],
   },
   {

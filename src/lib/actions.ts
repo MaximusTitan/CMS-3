@@ -8,6 +8,7 @@ import {
   TeacherSchema,
   AnnouncementSchema,
   DMSchema,
+  LessonSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -552,5 +553,140 @@ export const deleteAnnouncement = async (
   } catch (err) {
     console.log(err);
     return { success: false, error: true };
+  }
+};
+
+
+import { z } from "zod";
+
+// Zod schema for lesson validation (matching the client-side schema)
+const lessonSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, "Lesson name is required"),
+  day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]),
+  startTime: z.string(),
+  endTime: z.string(),
+  subjectId: z.number(),
+  batchId: z.number(),
+  teacherId: z.string()
+});
+
+type LessonSchema = z.infer<typeof lessonSchema>;
+type Currentstate = {
+  success: boolean;
+  error: boolean | string;
+};
+
+export const createLesson = async (
+  currentState: CurrentState,
+  formData: FormData
+) => {
+  try {
+    // Parse form data
+    const data = lessonSchema.parse({
+      name: formData.get("name"),
+      day: formData.get("day"),
+      startTime: formData.get("startTime"),
+      endTime: formData.get("endTime"),
+      subjectId: Number(formData.get("subjectId")),
+      batchId: Number(formData.get("batchId")),
+      teacherId: formData.get("teacherId")
+    });
+
+    // Create lesson in database
+    await prisma.lesson.create({
+      data: {
+        name: data.name,
+        day: data.day,
+        startTime: new Date(data.startTime),
+        endTime: new Date(data.endTime),
+        subject: {
+          connect: { id: data.subjectId }
+        },
+        batch: {
+          connect: { id: data.batchId }
+        },
+        teacher: {
+          connect: { id: data.teacherId }
+        }
+      }
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error creating lesson:", err);
+    return { 
+      success: false, 
+      error: err instanceof Error ? err.message : "An unknown error occurred" 
+    };
+  }
+};
+
+export const updateLesson = async (
+  currentState: CurrentState,
+  formData: FormData
+) => {
+  try {
+    // Parse form data
+    const data = lessonSchema.parse({
+      id: Number(formData.get("id")),
+      name: formData.get("name"),
+      day: formData.get("day"),
+      startTime: formData.get("startTime"),
+      endTime: formData.get("endTime"),
+      subjectId: Number(formData.get("subjectId")),
+      batchId: Number(formData.get("batchId")),
+      teacherId: formData.get("teacherId")
+    });
+
+    // Update lesson in database
+    await prisma.lesson.update({
+      where: { id: data.id },
+      data: {
+        name: data.name,
+        day: data.day,
+        startTime: new Date(data.startTime),
+        endTime: new Date(data.endTime),
+        subject: {
+          connect: { id: data.subjectId }
+        },
+        batch: {
+          connect: { id: data.batchId }
+        },
+        teacher: {
+          connect: { id: data.teacherId }
+        }
+      }
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error updating lesson:", err);
+    return { 
+      success: false, 
+      error: err instanceof Error ? err.message : "An unknown error occurred" 
+    };
+  }
+};
+
+export const deleteLesson = async (
+  currentState: CurrentState,
+  formData: FormData
+) => {
+  try {
+    const id = Number(formData.get("id"));
+
+    // Delete lesson from database
+    await prisma.lesson.delete({
+      where: { id }
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error deleting lesson:", err);
+    return { 
+      success: false, 
+      error: err instanceof Error ? err.message : "An unknown error occurred" 
+    };
   }
 };

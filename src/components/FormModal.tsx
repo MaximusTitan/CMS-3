@@ -7,6 +7,7 @@ import {
   deleteSubject,
   deleteTeacher,
   deleteDM,
+  deleteLesson,
 } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -24,7 +25,7 @@ const deleteActionMap = {
   DM:deleteDM,
 // TODO: OTHER DELETE ACTIONS
 
-  lesson: deleteSubject,
+  lesson: deleteLesson,
   event: deleteSubject,
   announcement: deleteAnnouncement,
 };
@@ -50,6 +51,9 @@ const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const DMForm = dynamic(() => import("./forms/DMForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const LessonForm = dynamic(() => import("./forms/LessonForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 // TODO: OTHER FORMS
@@ -106,6 +110,15 @@ const forms: {
  
   DM: (setOpen, type, data, relatedData) => (
     <DMForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+
+  lesson: (setOpen, type, data, relatedData) => (
+    <LessonForm
       type={type}
       data={data}
       setOpen={setOpen}

@@ -37,7 +37,7 @@ const columns = [
     accessor: "teacher",
     className: "hidden md:table-cell",
   },
-  ...(role === "admin" || role === "delivery_manager"
+  ...((role === "admin" || role === "delivery_manager")
     ? [
         {
           header: "Actions",
@@ -60,7 +60,7 @@ const renderRow = (item: LessonList) => (
     </td>
     <td>
       <div className="flex items-center gap-2">
-        {role === "admin" || role === "delivery_manager" && (
+        {(role === "admin" || role === "delivery_manager") && (
           <>
             <FormContainer table="lesson" type="update" data={item} />
             <FormContainer table="lesson" type="delete" id={item.id} />
@@ -130,7 +130,7 @@ const renderRow = (item: LessonList) => (
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin"  || role === "delivery_manager"&& <FormContainer table="lesson" type="create" />}
+            {(role === "admin"  || role === "delivery_manager") && <FormContainer table="lesson" type="create" />}
           </div>
         </div>
       </div>

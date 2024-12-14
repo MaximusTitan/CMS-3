@@ -116,3 +116,28 @@ export const announcementSchema = z.object({
 });
 
 export type AnnouncementSchema = z.infer<typeof announcementSchema>;
+
+const lessonSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, "Lesson name is required"),
+  day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], {
+    errorMap: () => ({ message: "Please select a valid day" })
+  }),
+  startTime: z.string().refine(val => !isNaN(Date.parse(val)), { 
+    message: "Start time is required" 
+  }),
+  endTime: z.string().refine(val => !isNaN(Date.parse(val)), { 
+    message: "End time is required" 
+  }),
+  subjectId: z.number({ 
+    errorMap: () => ({ message: "Subject is required" }) 
+  }),
+  batchId: z.number({ 
+    errorMap: () => ({ message: "Batch is required" }) 
+  }),
+  teacherId: z.string({ 
+    errorMap: () => ({ message: "Teacher is required" }) 
+  })
+});
+
+export type LessonSchema = z.infer<typeof lessonSchema>;
