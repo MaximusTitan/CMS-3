@@ -8,7 +8,6 @@ import {
   TeacherSchema,
   AnnouncementSchema,
   DMSchema,
-  LessonSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";

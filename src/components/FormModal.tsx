@@ -147,10 +147,20 @@ const FormModal = ({
   const [open, setOpen] = useState(false);
 
   const Form = () => {
-    const [state, formAction] = useFormState(deleteActionMap[table], {
+    // Explicitly type the initial state
+    const initialState = {
       success: false,
-      error: false,
-    });
+      error: false as boolean | string
+    };
+  
+    // Use a type assertion or type guard
+    const deleteAction = deleteActionMap[table] as 
+      (state: typeof initialState, formData: FormData) => Promise<typeof initialState>;
+  
+    const [state, formAction] = useFormState(deleteAction, initialState);
+  
+    // Rest of the code remains the same
+
 
     const router = useRouter();
 
