@@ -1,8 +1,9 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormRegister, FieldError } from "react-hook-form";
 import { z } from "zod";
 import InputField from "../InputField";
+import MultiInputField from "../multilineinputfield";
 import { createLesson, updateLesson, deleteLesson } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect } from "react";
@@ -34,6 +35,16 @@ const lessonSchema = z.object({
 });
 
 type LessonSchema = z.infer<typeof lessonSchema>;
+
+type InputFieldProps = {
+  label: string;
+  name: string;
+  register: UseFormRegister<any>;
+  error?: FieldError;
+  className?: string;
+  defaultValue?: string | number;
+  hidden?: boolean;
+};
 
 const LessonForm = ({
   type,
@@ -140,13 +151,14 @@ const LessonForm = ({
       {type !== "delete" ? (
         <>
           <div className="flex justify-between flex-wrap gap-4">
-            {/* All the existing input fields from previous implementation */}
-            <InputField
-              label="Lesson Name"
-              name="name"
-              register={register}
-              error={errors.name}
-            />
+            <div className="w-screen">
+              <MultiInputField
+                label="Lesson Name"
+                name="name"
+                register={register}
+                error={errors.name}
+              />
+            </div>
 
             {/* Day Selection */}
             <div className="flex flex-col gap-2 w-full md:w-1/4">
