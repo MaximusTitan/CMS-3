@@ -571,15 +571,12 @@ const lessonSchema = z.object({
 });
 
 type LessonSchema = z.infer<typeof lessonSchema>;
-type Currentstate = {
+type FormState = {
   success: boolean;
-  error: boolean | string;
+  error: string | null;
 };
 
-export const createLesson = async (
-  currentState: CurrentState,
-  formData: FormData
-) => {
+export const createLesson = async (prevState: FormState, formData: FormData): Promise<FormState> => {
   try {
     // Parse form data
     const data = lessonSchema.parse({
@@ -611,7 +608,7 @@ export const createLesson = async (
       }
     });
 
-    return { success: true, error: false };
+    return { success: true, error: null };
   } catch (err) {
     console.error("Error creating lesson:", err);
     return { 
@@ -621,10 +618,7 @@ export const createLesson = async (
   }
 };
 
-export const updateLesson = async (
-  currentState: CurrentState,
-  formData: FormData
-) => {
+export const updateLesson = async (prevState: FormState, formData: FormData): Promise<FormState> => {
   try {
     // Parse form data
     const data = lessonSchema.parse({
@@ -658,7 +652,7 @@ export const updateLesson = async (
       }
     });
 
-    return { success: true, error: false };
+    return { success: true, error: null };
   } catch (err) {
     console.error("Error updating lesson:", err);
     return { 
@@ -668,10 +662,7 @@ export const updateLesson = async (
   }
 };
 
-export const deleteLesson = async (
-  currentState: CurrentState,
-  formData: FormData
-) => {
+export const deleteLesson = async (prevState: FormState, formData: FormData): Promise<FormState> => {
   try {
     const id = Number(formData.get("id"));
 
@@ -680,7 +671,7 @@ export const deleteLesson = async (
       where: { id }
     });
 
-    return { success: true, error: false };
+    return { success: true, error: null };
   } catch (err) {
     console.error("Error deleting lesson:", err);
     return { 

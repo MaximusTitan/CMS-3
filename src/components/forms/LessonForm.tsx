@@ -80,7 +80,7 @@ const LessonForm = ({
   // Initialize form state
   const [state, formAction] = useFormState(selectedAction, {
     success: false,
-    error: false,
+    error: null as string | null,  // Change error to be null or a string
   });
 
   const router = useRouter();
