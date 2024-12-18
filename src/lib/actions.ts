@@ -8,6 +8,7 @@ import {
   TeacherSchema,
   AnnouncementSchema,
   DMSchema,
+  batchSchema,  // Add this import
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -86,22 +87,26 @@ export const createBatch = async (
   data: BatchSchema & { assistantLecturerIds?: string[] }
 ) => {
   try {
-    const { assistantLecturerIds, ...batchData } = data;
+    const { zoomLink, assistantLecturerIds, ...batchData } = data;
+
+    // First create ZoomLink if provided
+    let zoomLinkRecord;
+    if (zoomLink) {
+      zoomLinkRecord = await prisma.zoomLink.create({
+        data: { url: zoomLink }
+      });
+    }
 
     const batch = await prisma.batch.create({
       data: {
         ...batchData,
         assistantLecturers: assistantLecturerIds 
-          ? {
-              connect: assistantLecturerIds.map(id => ({ id }))
-            }
+          ? { connect: assistantLecturerIds.map(id => ({ id })) }
           : undefined,
-        // Ensure zoomLink is a valid property in BatchCreateInput
-        ...(batchData.zoomLink && { zoomLink: batchData.zoomLink }),
+        zoomLinkId: zoomLinkRecord?.id,
       },
     });
 
-    // revalidatePath("/list/class");
     return { success: true, error: false };
   } catch (err) {
     console.error(err);
@@ -110,46 +115,62 @@ export const createBatch = async (
 };
 
 
-export const updateBatch = async (
-  currentState: CurrentState,
-  data: BatchSchema & { assistantLecturerIds?: string[] }
-) => {
+export async function updateBatch(prevState: any, formData: any) {
   try {
-    const { assistantLecturerIds, ...batchData } = data;
+    const validatedFields = batchSchema.safeParse(formData);
+    
+    if (!validatedFields.success) {
+      console.error("Validation error:", validatedFields.error);
+      return { success: false, error: true };
+    }
 
-    const batch = await prisma.batch.update({
+    const data = validatedFields.data;
+    
+    // Prepare zoom link data if provided
+    const zoomLinkData = data.zoomLink ? {
+      zoomLink: {
+        upsert: {
+          create: { url: data.zoomLink },
+          update: { url: data.zoomLink },
+        }
+      }
+    } : {};
+
+    // Prepare assistant lecturers data
+    const assistantLecturersData = data.assistantLecturerIds ? {
+      assistantLecturers: {
+        set: data.assistantLecturerIds.map(id => ({ id }))
+      }
+    } : {};
+
+    await prisma.batch.update({
       where: {
-        id: batchData.id,
+        id: Number(data.id),
       },
       data: {
-        ...batchData,
-        assistantLecturers: {
-          // Disconnect all current assistant lecturers
-          disconnect: await prisma.batch
-            .findUnique({ 
-              where: { id: batchData.id }, 
-              select: { assistantLecturers: { select: { id: true } } } 
-            })
-            .then(result => result?.assistantLecturers || []),
-          
-          // Connect new assistant lecturers if provided
-          connect: assistantLecturerIds 
-            ? assistantLecturerIds.map(id => ({ id }))
-            : undefined,
+        name: data.name,
+        capacity: data.capacity,
+        Grade: {
+          connect: { id: data.gradeId }
         },
-        ...(batchData.zoomLink && { zoomLink: batchData.zoomLink }),
+        supervisor: data.supervisorId ? {
+          connect: { id: data.supervisorId }
+        } : undefined,
+        DM: data.dmId ? {
+          connect: { id: data.dmId }
+        } : { disconnect: true },
+        ...assistantLecturersData,
+        ...zoomLinkData,
       },
     });
 
-    // revalidatePath("/list/class");
     return { success: true, error: false };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error updating batch:", error);
     return { success: false, error: true };
   }
-};
+}
 
-// Keep other existing actions the same...
 export const deleteBatch = async (
   currentState: CurrentState,
   data: FormData

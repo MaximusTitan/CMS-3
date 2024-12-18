@@ -60,6 +60,20 @@ const ClassForm = ({
     }
   }, [state, router, type, setOpen]);
 
+  useEffect(() => {
+    if (data) {
+      setValue("name", data.name);
+      setValue("capacity", data.capacity);
+      setValue("gradeId", data.gradeId);
+      setValue("supervisorId", data.supervisorId);
+      setValue("dmId", data.dmId);
+      setValue("zoomLink", data?.zoomLink?.url);
+      setValue("assistantLecturerIds", 
+        data.assistantLecturers?.map((t: any) => t.id) || []
+      );
+    }
+  }, [data, setValue]);
+
   const { teachers, grades } = relatedData;
 
   return (
@@ -97,8 +111,8 @@ const ClassForm = ({
           label="Zoom Link"
           name="zoomLink"
           register={register}
-          defaultValue={data?.zoomLink}
-          error={errors?.zoomLink}
+          defaultValue={data?.zoomLink?.url}
+          error={errors?.zoomLink}      
         />
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label className="text-xs text-gray-500">Supervisor</label>
@@ -172,6 +186,22 @@ const ClassForm = ({
               {errors.gradeId.message.toString()}
             </p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label className="text-xs text-gray-500">Delivery Manager</label>
+          <select
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            {...register("dmId")}
+            defaultValue={data?.dmId}
+          >
+            <option value="">Select DM</option>
+            {relatedData?.dm?.map((dm: { id: string; name: string; surname: string }) => (
+              <option key={dm.id} value={dm.id}>
+                {dm.name + " " + dm.surname}
+              </option>
+            )) || []}
+          </select>
         </div>
       </div>
 

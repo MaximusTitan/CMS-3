@@ -16,11 +16,12 @@ export const batchSchema = z.object({
   supervisorId: z.coerce.string().optional(),
   assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
   dmId: z.string().optional(), // Delivery Manager ID (optional)
+  zoomLinkId: z.coerce.number().optional(),
   zoomLink: z.string().url({ message: "Valid Zoom link is required!" }).optional(), // Zoom link (optional)
 });
 
-export type BatchSchema = z.infer<typeof batchSchema>;
 
+export type BatchSchema = z.infer<typeof batchSchema>;
 
 export const teacherSchema = z.object({
   id: z.string().optional(),

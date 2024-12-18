@@ -81,8 +81,8 @@ model Batch {
   dMId               String?
   Grade              Grade?         @relation(fields: [gradeId], references: [id])
   gradeId            Int?
-  zoomLink           ZoomLink?      @relation(fields: [zoomLinkId], references: [id])
-  zoomLinkId         Int?
+  zoomLink           ZoomLink?      @relation("BatchToZoomLink", fields: [zoomLinkId], references: [id])
+  zoomLinkId         Int?           @unique
 }
 
 model Subject {
@@ -146,7 +146,7 @@ model DM {
 model ZoomLink {
   id      Int     @id @default(autoincrement())
   url     String
-  batch   Batch?  @relation(fields: [batchId], references: [id])
+  batch   Batch?  @relation("BatchToZoomLink")
   batchId Int?    @unique
 }
 

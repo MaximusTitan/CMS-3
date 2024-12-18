@@ -12,19 +12,6 @@ const StudentPage = async () => {
     where: {
       students: { some: { id: userId! } },
     },
-    select: {
-      id: true,
-      name: true,
-      capacity: true,
-      supervisorId: true,
-      dMId: true,
-      gradeId: true,
-      zoomLink: {
-        select: {
-          url: true,
-        },
-      },
-    },
   });
   
   console.log(batches);
@@ -37,7 +24,7 @@ const StudentPage = async () => {
           {batches.map((batch) => (
             <div key={batch.id} className="mt-4">
               <h2 className="text-lg font-medium">{batch.name}</h2>
-              <a href={batch.zoomLink?.url} target="_blank" rel="noopener noreferrer">
+              <a href={batch.zoomLink ?? undefined} target="_blank" rel="noopener noreferrer">
                 <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
                   Join Zoom Meeting
                 </button>
