@@ -96,6 +96,8 @@ export const createBatch = async (
               connect: assistantLecturerIds.map(id => ({ id }))
             }
           : undefined,
+        // Ensure zoomLink is a valid property in BatchCreateInput
+        ...(batchData.zoomLink && { zoomLink: batchData.zoomLink }),
       },
     });
 
@@ -135,6 +137,7 @@ export const updateBatch = async (
             ? assistantLecturerIds.map(id => ({ id }))
             : undefined,
         },
+        ...(batchData.zoomLink && { zoomLink: batchData.zoomLink }),
       },
     });
 

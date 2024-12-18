@@ -28,19 +28,13 @@ const ClassForm = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
   relatedData?: any;
 }) => {
-  // Modify the Zod schema to support one supervisor and multiple assistant lecturers
-  const modifiedBatchSchema = batchSchema.extend({
-    supervisorId: z.string().optional(),
-    assistantLecturerIds: z.array(z.string()).optional(),
-  });
-
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<z.infer<typeof modifiedBatchSchema>>({
-    resolver: zodResolver(modifiedBatchSchema),
+  } = useForm<BatchSchema>({
+    resolver: zodResolver(batchSchema),
   });
 
   const [state, formAction] = useFormState(
@@ -85,8 +79,8 @@ const ClassForm = ({
         <InputField
           label="Capacity"
           name="capacity"
-          defaultValue={data?.capacity}
           register={register}
+          defaultValue={data?.capacity}
           error={errors?.capacity}
         />
         {data && (
@@ -99,7 +93,13 @@ const ClassForm = ({
             hidden
           />
         )}
-        
+        <InputField
+          label="Zoom Link"
+          name="zoomLink"
+          register={register}
+          defaultValue={data?.zoomLink}
+          error={errors?.zoomLink}
+        />
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label className="text-xs text-gray-500">Supervisor</label>
           <select

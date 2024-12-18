@@ -133,6 +133,10 @@ const renderRow = (item: BatchList) => (
     prisma.batch.count({ where: query }),
   ]);
   
+  // Check if no data was fetched
+  // if (!data || count === 0) {
+  //   return <p>No batches found</p>;
+  // }
 
 
   return (
