@@ -12,7 +12,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { BatchSchema, DMSchema } from "@/lib/formValidationSchemas";
 
-type DMList = DM & { batches: Batch }; // Update type for DM with its relationships
+type DMList = DM & { batches: Batch[] }; // Update type for DM with its relationships
 
 const DMListPage = async ({
   searchParams,
@@ -30,6 +30,11 @@ const DMListPage = async ({
     {
       header: "Username",
       accessor: "id", // Replace with appropriate DM field
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Batches",
+      accessor: "batches", // Changed from "id" to "batches"
       className: "hidden md:table-cell",
     },
     {
@@ -71,6 +76,7 @@ const DMListPage = async ({
         </div>
       </td>
       <td className="hidden md:table-cell">{item.username}</td> {/* Update username */}
+      <td className="hidden md:table-cell">{item.batches.map(batch => `${batch.name},  `)}</td>
       <td className="hidden md:table-cell">{item.phone}</td>
       <td className="hidden md:table-cell">{item.email}</td>
       <td>
@@ -154,3 +160,4 @@ const DMListPage = async ({
 };
 
 export default DMListPage;
+

@@ -12,14 +12,12 @@ export const batchSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "Batch name is required!" }),
   capacity: z.coerce.number().min(1, { message: "Capacity is required!" }),
-  gradeId: z.coerce.number().min(1, { message: "Grade is required!" }),
+  gradeId: z.coerce.number().optional(), // Make gradeId optional
   supervisorId: z.coerce.string().optional(),
   assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
   dmId: z.string().optional(), // Delivery Manager ID (optional)
-  zoomLinkId: z.coerce.number().optional(),
   zoomLink: z.string().url({ message: "Valid Zoom link is required!" }).optional(), // Zoom link (optional)
 });
-
 
 export type BatchSchema = z.infer<typeof batchSchema>;
 
@@ -74,7 +72,7 @@ export const studentSchema = z.object({
   img: z.string().optional(),
   birthday: z.coerce.date({ message: "Birthday is required!" }),
   sex: z.enum(["MALE", "FEMALE"], { message: "Sex is required!" }),
-  gradeId: z.coerce.number().min(1, { message: "Grade is required!" }),
+  gradeId: z.coerce.number().optional(), // Make gradeId optional
   batchId: z.coerce.number().min(1, { message: "Batch is required!" }),
 });
 
@@ -131,15 +129,4 @@ const lessonSchema = z.object({
   endTime: z.string().refine(val => !isNaN(Date.parse(val)), { 
     message: "End time is required" 
   }),
-  subjectId: z.number({ 
-    errorMap: () => ({ message: "Subject is required" }) 
-  }),
-  batchId: z.number({ 
-    errorMap: () => ({ message: "Batch is required" }) 
-  }),
-  teacherId: z.string({ 
-    errorMap: () => ({ message: "Teacher is required" }) 
-  })
-});
-
-export type LessonSchema = z.infer<typeof lessonSchema>;
+  subjectId: z.number({     errorMap: () => ({ message: "Subject is required" })   }),  batchId: z.number({     errorMap: () => ({ message: "Batch is required" })   }),  teacherId: z.string({     errorMap: () => ({ message: "Teacher is required" })   })});export type LessonSchema = z.infer<typeof lessonSchema>;

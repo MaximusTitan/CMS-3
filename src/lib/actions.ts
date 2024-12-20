@@ -86,34 +86,68 @@ export const createBatch = async (
   currentState: CurrentState,
   data: BatchSchema & { assistantLecturerIds?: string[] }
 ) => {
-  try {
-    const { zoomLink, assistantLecturerIds, ...batchData } = data;
+  console.log("Received data in createBatch:", data); // Debug log
 
-    // First create ZoomLink if provided
-    let zoomLinkRecord;
+  try {
+    // First validate the data
+    const validatedData = batchSchema.parse(data);
+    console.log("Validated data:", validatedData); // Debug log
+
+    const {
+      name,
+      capacity,
+      gradeId,
+      supervisorId,
+      dmId,
+      zoomLink,
+      assistantLecturerIds,
+    } = validatedData;
+
+    // Create ZoomLink if provided
+    let zoomLinkRecord = null;
     if (zoomLink) {
       zoomLinkRecord = await prisma.zoomLink.create({
         data: { url: zoomLink }
       });
+      console.log("Created ZoomLink:", zoomLinkRecord); // Debug log
     }
 
+    // Create the batch
     const batch = await prisma.batch.create({
       data: {
-        ...batchData,
-        assistantLecturers: assistantLecturerIds 
-          ? { connect: assistantLecturerIds.map(id => ({ id })) }
-          : undefined,
-        zoomLinkId: zoomLinkRecord?.id,
+        name,
+        capacity,
+        ...(gradeId && {
+          Grade: { connect: { id: gradeId } }
+        }),
+        ...(supervisorId && {
+          supervisor: { connect: { id: supervisorId } }
+        }),
+        ...(dmId && {
+          DM: { connect: { id: dmId } }
+        }),
+        ...(zoomLinkRecord && {
+          zoomLink: { connect: { id: zoomLinkRecord.id } }
+        }),
+        ...(assistantLecturerIds && assistantLecturerIds.length > 0 && {
+          assistantLecturers: {
+            connect: assistantLecturerIds.map(id => ({ id }))
+          }
+        })
       },
     });
 
+    console.log("Created batch:", batch); // Debug log
     return { success: true, error: false };
   } catch (err) {
-    console.error(err);
-    return { success: false, error: true };
+    console.error("Error creating batch:", err);
+    return { 
+      success: false, 
+      error: true,
+      message: err instanceof Error ? err.message : "An unknown error occurred"
+    };
   }
 };
-
 
 export async function updateBatch(prevState: any, formData: any) {
   try {

@@ -2,6 +2,15 @@ import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
 
+// Add proper type for relatedData
+type RelatedData = {
+  teachers?: { id: string; name: string; surname: string }[];
+  subjects?: { id: number; name: string }[];
+  grades?: { id: number; level: number }[];
+  batches?: { id: number; name: string }[];
+  DM?: { id: string; name: string; surname: string }[];
+};
+
 export type FormContainerProps = {
   table:
     | "teacher"
@@ -11,15 +20,15 @@ export type FormContainerProps = {
     | "lesson"
     | "event"
     | "DM"
-    | "announcement"
-    | "lesson";
+    | "announcement";
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
+  // Removed 'relatedData' from props
 };
 
 const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
-  let relatedData = {};
+  let relatedData: RelatedData = {};
 
   const { userId, sessionClaims } = auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
@@ -40,7 +49,10 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         const batchTeachers = await prisma.teacher.findMany({
           select: { id: true, name: true, surname: true },
         });
-        relatedData = { teachers: batchTeachers, grades: batchGrades };
+        const dms = await prisma.dM.findMany({
+          select: { id: true, name: true, surname: true },
+        });
+        relatedData = { teachers: batchTeachers, grades: batchGrades, dms: dms };
         break;
       case "teacher":
         const teacherSubjects = await prisma.subject.findMany({
@@ -55,7 +67,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         const studentBatches = await prisma.batch.findMany({
           include: { _count: { select: { students: true } } },
         });
-        relatedData = { classes: studentBatches, grades: studentGrades };
+        relatedData = { batches: studentBatches, grades: studentGrades };
         break;
 
         case "lesson":
@@ -87,8 +99,14 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
 
           relatedData = { batches: batches };
           break;
-      
 
+        case "event":
+          const eventBatches = await prisma.batch.findMany({
+            select: { id: true, name: true },
+          });
+          relatedData = { batches: eventBatches };
+          break;
+      
       default:
         break;
     }
@@ -101,7 +119,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         type={type}
         data={data}
         id={id}
-        relatedData={relatedData}
+        relatedData={relatedData} // Pass constructed relatedData
       />
     </div>
   );

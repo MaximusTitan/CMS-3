@@ -60,6 +60,12 @@ const menuItems = [
         href: "/list/lessons",
         visible: ["admin", "delivery_manager"],
       },
+      {
+        icon: "/lesson.png",
+        label: "Class Recordings",
+        href: "/recordings",
+        visible: ["admin", "delivery_manager","teacher","student"],
+      },
     ],
   },
   {

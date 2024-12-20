@@ -1,4 +1,3 @@
-
 import FormContainer from "@/components/FormContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
@@ -12,9 +11,9 @@ import Link from "next/link";
 import { assignmentsData } from "@/lib/data";
 
 type BatchList = Batch & { 
-  supervisor: Teacher 
-} & { 
-  assistantLecturers: Teacher[] 
+  supervisor: Teacher,
+  assistantLecturers: Teacher[],
+  DM: { id: string; name: string; surname: string } | null // Add DM type
 };
 
 const BatchListPage = async ({
@@ -44,6 +43,11 @@ const columns = [
     className: "hidden md:table-cell",
   },
   {
+    header: "Delivery Manager",  // Add DM column
+    accessor: "dm",
+    className: "hidden md:table-cell",
+  },
+  {
     header: "Assistant Teacher",
     accessor: "assistant teacher",
     className: "hidden md:table-cell",
@@ -70,6 +74,9 @@ const renderRow = (item: BatchList) => (
 
     <td className="hidden md:table-cell">
       {item.supervisor.name + " " + item.supervisor.surname}
+    </td>
+    <td className="hidden md:table-cell">
+      {item.DM ? `${item.DM.name} ${item.DM.surname}` : "Not assigned"}
     </td>
     <td className="hidden md:table-cell">
   {item.assistantLecturers.length > 0 
@@ -126,12 +133,28 @@ const renderRow = (item: BatchList) => (
       include: {
         supervisor: true,
         assistantLecturers: true, // Ensure this matches the schema
+        DM: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+          }
+        },
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
     prisma.batch.count({ where: query }),
   ]);
+  
+  const dms = await prisma.dM.findMany({
+    select: {
+      id: true,
+      name: true,
+      surname: true,
+      batches: true,
+    },
+  });
   
   // Check if no data was fetched
   // if (!data || count === 0) {
@@ -153,7 +176,7 @@ const renderRow = (item: BatchList) => (
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" />}
+            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" relatedData={{ dms /*, ...other related data if needed */ }} />}
           </div>
         </div>
       </div>

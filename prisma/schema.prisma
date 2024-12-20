@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -31,29 +25,27 @@ model Student {
   createdAt DateTime @default(now())
   batchId   Int
   batch     Batch    @relation(fields: [batchId], references: [id])
-  gradeId   Int
-  grade     Grade    @relation(fields: [gradeId], references: [id])
+  gradeId   Int?     // Make gradeId optional
+  grade     Grade?   @relation(fields: [gradeId], references: [id])
   birthday  DateTime
 }
 
 model Teacher {
-  id        String    @id
-  username  String    @unique
-  name      String
-  surname   String
-  email     String?   @unique
-  phone     String?   @unique
-  address   String
-  img       String?
-  sex       UserSex
-  createdAt DateTime  @default(now())
-  subjects  Subject[]
-  lessons   Lesson[]
-  batches   Batch[]
-  birthday  DateTime
-
-  // New field for assistant lecturer batches
-  assistantBatches Batch[] @relation("BatchAssistantLecturers")
+  id                String      @id
+  username          String      @unique
+  name              String
+  surname           String
+  email             String?     @unique
+  phone             String?     @unique
+  address           String
+  img               String?
+  sex               UserSex
+  birthday          DateTime
+  assistantBatches  Batch[]     @relation("BatchAssistantLecturers")
+  subjects          Subject[]
+  createdAt         DateTime    @default(now())
+  lessons           Lesson[]
+  batches           Batch[]
 }
 
 model Grade {
@@ -65,9 +57,9 @@ model Grade {
 }
 
 model Batch {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  capacity Int
+  id                 Int             @id @default(autoincrement())
+  name               String          @unique
+  capacity           Int
 
   // New fields for assistant lecturers
   assistantLecturers Teacher[]      @relation("BatchAssistantLecturers")
@@ -77,12 +69,13 @@ model Batch {
   students           Student[]
   events             Event[]
   announcements      Announcement[]
-  DM                 DM?            @relation(fields: [dMId], references: [id])
+  DM                 DM?             @relation("DMBatches", fields: [dMId], references: [id])
   dMId               String?
   Grade              Grade?         @relation(fields: [gradeId], references: [id])
-  gradeId            Int?
+  gradeId            Int?           // Make gradeId optional
   zoomLink           ZoomLink?      @relation("BatchToZoomLink", fields: [zoomLinkId], references: [id])
   zoomLinkId         Int?           @unique
+  classRecordings    ClassRecording[]
 }
 
 model Subject {
@@ -139,7 +132,7 @@ model DM {
   img       String? // Optional image URL
   sex       UserSex // Gender
   createdAt DateTime @default(now()) // Automatically set creation time
-  batches   Batch[] // Relation to the batches managed by this DM
+  batches   Batch[]  @relation("DMBatches")
   birthday  DateTime // Date of birth
 }
 
@@ -147,7 +140,19 @@ model ZoomLink {
   id      Int     @id @default(autoincrement())
   url     String
   batch   Batch?  @relation("BatchToZoomLink")
-  batchId Int?    @unique
+  batchId Int?
+}
+
+model ClassRecording {
+  id          String   @id @default(cuid())
+  batchId     Int      // Changed from String to Int to match Batch.id
+  batch       Batch    @relation(fields: [batchId], references: [id])
+  title       String
+  recordingUrl String
+  description String   @db.Text
+  teacherId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum UserSex {
