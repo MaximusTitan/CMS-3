@@ -13,9 +13,9 @@ export const batchSchema = z.object({
   name: z.string().min(1, { message: "Batch name is required!" }),
   capacity: z.coerce.number().min(1, { message: "Capacity is required!" }),
   gradeId: z.coerce.number().optional(), // Make gradeId optional
-  supervisorId: z.coerce.string().optional(),
-  assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
-  dmId: z.string().optional(), // Delivery Manager ID (optional)
+  supervisorId: z.coerce.string(),
+  assistantLecturerIds: z.array(z.string()), // Array of assistant lecturer IDs
+  dmId: z.coerce.string().optional(), // Ensure dmId is correctly defined
   zoomLink: z.string().url({ message: "Valid Zoom link is required!" }).optional(), // Zoom link (optional)
 });
 

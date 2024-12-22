@@ -69,8 +69,8 @@ model Batch {
   students           Student[]
   events             Event[]
   announcements      Announcement[]
-  DM                 DM?             @relation("DMBatches", fields: [dMId], references: [id])
-  dMId               String?
+  DM                 DM?             @relation("DMBatches", fields: [dmId], references: [id])
+  dmId               String?
   Grade              Grade?         @relation(fields: [gradeId], references: [id])
   gradeId            Int?           // Make gradeId optional
   zoomLink           ZoomLink?      @relation("BatchToZoomLink", fields: [zoomLinkId], references: [id])

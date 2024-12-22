@@ -67,7 +67,7 @@ const StudentForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  const { grades, classes } = relatedData;
+  const { grades = [], batches = [] } = relatedData || {};
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -206,22 +206,22 @@ const StudentForm = ({
           )}
         </div>
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Class</label>
+          <label className="text-xs text-gray-500">Batch</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("batchId")}
             defaultValue={data?.batchId}
           >
-            {classes.map(
-              (classItem: {
+            {batches.map(
+              (batch: {
                 id: number;
                 name: string;
                 capacity: number;
                 _count: { students: number };
               }) => (
-                <option value={classItem.id} key={classItem.id}>
-                  ({classItem.name} -{" "}
-                  {classItem._count.students + "/" + classItem.capacity}{" "}
+                <option value={batch.id} key={batch.id}>
+                  ({batch.name} -{" "}
+                  {batch._count.students + "/" + batch.capacity}{" "}
                   Capacity)
                 </option>
               )

@@ -92,7 +92,7 @@ const renderRow = (item: BatchList) => (
         </Link>
         {(role === "admin" || role === "delivery_manager") && (
           <>
-            <FormContainer table="batch" type="update" data={item} />
+            <FormContainer table="batch" type="update" data={item} relatedData={dms} />
             <FormContainer table="batch" type="delete" id={item.id} />
           </>
         )}
@@ -170,13 +170,13 @@ const renderRow = (item: BatchList) => (
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
+            <button type="button" className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/filter.png" alt="" width={14} height={14} />
             </button>
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" />}
+            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" relatedData={ dms  } />}
           </div>
         </div>
       </div>

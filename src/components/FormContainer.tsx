@@ -8,7 +8,7 @@ type RelatedData = {
   subjects?: { id: number; name: string }[];
   grades?: { id: number; level: number }[];
   batches?: { id: number; name: string }[];
-  DMs?: { id: string; name: string; surname: string }[];
+  DM?: { id: string; name: string; surname: string }[];
 };
 
 export type FormContainerProps = {
@@ -50,9 +50,9 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
           select: { id: true, name: true, surname: true },
         });
         const dms = await prisma.dM.findMany({
-          select: { id: true, name: true, surname: true },
+          select: { id: true, name: true, surname: true, batches: true },
         });
-        relatedData = { teachers: batchTeachers, grades: batchGrades, DMs: dms };
+        relatedData = { teachers: batchTeachers, grades: batchGrades, DM: dms };
         break;
       case "teacher":
         const teacherSubjects = await prisma.subject.findMany({

@@ -86,12 +86,8 @@ export const createBatch = async (
   currentState: CurrentState,
   data: BatchSchema & { assistantLecturerIds?: string[] }
 ) => {
-  console.log("Received data in createBatch:", data); // Debug log
-
   try {
-    // First validate the data
     const validatedData = batchSchema.parse(data);
-    console.log("Validated data:", validatedData); // Debug log
 
     const {
       name,
@@ -103,41 +99,31 @@ export const createBatch = async (
       assistantLecturerIds,
     } = validatedData;
 
-    // Create ZoomLink if provided
-    let zoomLinkRecord = null;
-    if (zoomLink) {
-      zoomLinkRecord = await prisma.zoomLink.create({
-        data: { url: zoomLink }
-      });
-      console.log("Created ZoomLink:", zoomLinkRecord); // Debug log
-    }
+    await prisma.$transaction(async (prisma) => {
+      let zoomLinkRecord = null;
+      if (zoomLink) {
+        zoomLinkRecord = await prisma.zoomLink.create({
+          data: { url: zoomLink },
+        });
+      }
 
-    // Create the batch
-    const batch = await prisma.batch.create({
-      data: {
-        name,
-        capacity,
-        ...(gradeId && {
-          Grade: { connect: { id: gradeId } }
-        }),
-        ...(supervisorId && {
-          supervisor: { connect: { id: supervisorId } }
-        }),
-        ...(dmId && {
-          DM: { connect: { id: dmId } }
-        }),
-        ...(zoomLinkRecord && {
-          zoomLink: { connect: { id: zoomLinkRecord.id } }
-        }),
-        ...(assistantLecturerIds && assistantLecturerIds.length > 0 && {
-          assistantLecturers: {
-            connect: assistantLecturerIds.map(id => ({ id }))
-          }
-        })
-      },
+      await prisma.batch.create({
+        data: {
+          name,
+          capacity,
+          ...(gradeId && { Grade: { connect: { id: gradeId } } }),
+          ...(supervisorId && { supervisor: { connect: { id: supervisorId } } }),
+          ...(dmId && { DM: { connect: { id: dmId } } }),
+          ...(zoomLinkRecord && { zoomLink: { connect: { id: zoomLinkRecord.id } } }),
+          ...(assistantLecturerIds && assistantLecturerIds.length > 0 && {
+            assistantLecturers: {
+              connect: assistantLecturerIds.map(id => ({ id })),
+            },
+          }),
+        },
+      });
     });
 
-    console.log("Created batch:", batch); // Debug log
     return { success: true, error: false };
   } catch (err) {
     console.error("Error creating batch:", err);
@@ -149,7 +135,10 @@ export const createBatch = async (
   }
 };
 
-export async function updateBatch(prevState: any, formData: any) {
+export async function updateBatch(
+  prevState: CurrentState, 
+  formData: BatchSchema & { assistantLecturerIds?: string[] }
+) {
   try {
     const validatedFields = batchSchema.safeParse(formData);
     
@@ -160,42 +149,34 @@ export async function updateBatch(prevState: any, formData: any) {
 
     const data = validatedFields.data;
     
-    // Prepare zoom link data if provided
-    const zoomLinkData = data.zoomLink ? {
-      zoomLink: {
-        upsert: {
-          create: { url: data.zoomLink },
+    await prisma.$transaction(async (prisma) => {
+      if (data.zoomLink) {
+        await prisma.zoomLink.upsert({
+          where: { id: data.zoomLinkId || '' },
           update: { url: data.zoomLink },
-        }
+          create: { url: data.zoomLink },
+        });
       }
-    } : {};
 
-    // Prepare assistant lecturers data
-    const assistantLecturersData = data.assistantLecturerIds ? {
-      assistantLecturers: {
-        set: data.assistantLecturerIds.map(id => ({ id }))
-      }
-    } : {};
-
-    await prisma.batch.update({
-      where: {
-        id: Number(data.id),
-      },
-      data: {
-        name: data.name,
-        capacity: data.capacity,
-        Grade: {
-          connect: { id: data.gradeId }
+      await prisma.batch.update({
+        where: { id: Number(data.id) },
+        data: {
+          name: data.name,
+          capacity: data.capacity,
+          Grade: { connect: { id: data.gradeId } },
+          supervisor: data.supervisorId
+            ? { connect: { id: data.supervisorId } }
+            : undefined,
+          DM: data.dmId
+            ? { connect: { id: data.dmId } }
+            : { disconnect: true },
+          ...(data.assistantLecturerIds && {
+            assistantLecturers: {
+              set: data.assistantLecturerIds.map(id => ({ id })),
+            },
+          }),
         },
-        supervisor: data.supervisorId ? {
-          connect: { id: data.supervisorId }
-        } : undefined,
-        DM: data.dmId ? {
-          connect: { id: data.dmId }
-        } : { disconnect: true },
-        ...assistantLecturersData,
-        ...zoomLinkData,
-      },
+      });
     });
 
     return { success: true, error: false };
@@ -203,28 +184,7 @@ export async function updateBatch(prevState: any, formData: any) {
     console.error("Error updating batch:", error);
     return { success: false, error: true };
   }
-}
-
-export const deleteBatch = async (
-  currentState: CurrentState,
-  data: FormData
-) => {
-  const id = data.get("id") as string;
-  try {
-    await prisma.batch.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
-
-    // revalidatePath("/list/class");
-    return { success: true, error: false };
-  } catch (err) {
-    console.error(err);
-    return { success: false, error: true };
-  }
 };
-
 
 export const createTeacher = async (
   currentState: CurrentState,
