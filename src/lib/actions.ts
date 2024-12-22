@@ -8,10 +8,13 @@ import {
   TeacherSchema,
   AnnouncementSchema,
   DMSchema,
-  batchSchema,  // Add this import
+  batchSchema,
+  ZoomLinkSchema,
+    // Add this import
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
+import { DM } from "@prisma/client"; // Import DM type
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -150,12 +153,22 @@ export async function updateBatch(
     const data = validatedFields.data;
     
     await prisma.$transaction(async (prisma) => {
+      let zoomLinkRecord = null;
+
       if (data.zoomLink) {
-        await prisma.zoomLink.upsert({
-          where: { id: data.zoomLinkId || '' },
-          update: { url: data.zoomLink },
-          create: { url: data.zoomLink },
-        });
+        if (data.zoomLinkId) {
+          // Upsert existing ZoomLink
+          zoomLinkRecord = await prisma.zoomLink.upsert({
+            where: { id: data.zoomLinkId },
+            update: { url: data.zoomLink },
+            create: { url: data.zoomLink },
+          });
+        } else {
+          // Create new ZoomLink
+          zoomLinkRecord = await prisma.zoomLink.create({
+            data: { url: data.zoomLink },
+          });
+        }
       }
 
       await prisma.batch.update({
@@ -175,6 +188,9 @@ export async function updateBatch(
               set: data.assistantLecturerIds.map(id => ({ id })),
             },
           }),
+          ...(zoomLinkRecord && {
+            zoomLink: { connect: { id: zoomLinkRecord.id } },
+          }),
         },
       });
     });
@@ -182,6 +198,26 @@ export async function updateBatch(
     return { success: true, error: false };
   } catch (error) {
     console.error("Error updating batch:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteBatch = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.batch.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    // revalidatePath("/list/batches");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
     return { success: false, error: true };
   }
 };

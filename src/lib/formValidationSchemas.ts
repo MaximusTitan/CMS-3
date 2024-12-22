@@ -13,10 +13,11 @@ export const batchSchema = z.object({
   name: z.string().min(1, { message: "Batch name is required!" }),
   capacity: z.coerce.number().min(1, { message: "Capacity is required!" }),
   gradeId: z.coerce.number().optional(), // Make gradeId optional
-  supervisorId: z.coerce.string(),
-  assistantLecturerIds: z.array(z.string()), // Array of assistant lecturer IDs
+  supervisorId: z.coerce.string().optional(), // Ensure supervisorId is optional
+  assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
   dmId: z.coerce.string().optional(), // Ensure dmId is correctly defined
   zoomLink: z.string().url({ message: "Valid Zoom link is required!" }).optional(), // Zoom link (optional)
+  zoomLinkId: z.coerce.number().optional(), // Add zoomLinkId as optional
 });
 
 export type BatchSchema = z.infer<typeof batchSchema>;
@@ -129,4 +130,52 @@ const lessonSchema = z.object({
   endTime: z.string().refine(val => !isNaN(Date.parse(val)), { 
     message: "End time is required" 
   }),
-  subjectId: z.number({     errorMap: () => ({ message: "Subject is required" })   }),  batchId: z.number({     errorMap: () => ({ message: "Batch is required" })   }),  teacherId: z.string({     errorMap: () => ({ message: "Teacher is required" })   })});export type LessonSchema = z.infer<typeof lessonSchema>;
+  subjectId: z.number({     errorMap: () => ({ message: "Subject is required" })   }),  batchId: z.number({     errorMap: () => ({ message: "Batch is required" })   }),  teacherId: z.string({     errorMap: () => ({ message: "Teacher is required" })   })});
+
+export type LessonSchema = z.infer<typeof lessonSchema>;
+
+export const adminSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+});
+
+export type AdminSchema = z.infer<typeof adminSchema>;
+
+export const gradeSchema = z.object({
+  id: z.number().optional(),
+  level: z.number().min(1, { message: "Grade level is required!" }),
+});
+
+export type GradeSchema = z.infer<typeof gradeSchema>;
+
+export const eventSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().min(1, { message: "Event title is required!" }),
+  description: z.string().min(1, { message: "Description is required!" }),
+  startTime: z.coerce.date(),
+  endTime: z.coerce.date(),
+  batchId: z.number().optional(),
+});
+
+export type EventSchema = z.infer<typeof eventSchema>;
+
+export const zoomLinkSchema = z.object({
+  id: z.number().optional(),
+  url: z.string().url({ message: "Valid Zoom link is required!" }),
+  batchId: z.number().optional(),
+});
+
+export type ZoomLinkSchema = z.infer<typeof zoomLinkSchema>;
+
+export const classRecordingSchema = z.object({
+  id: z.string(),
+  batchId: z.number(),
+  title: z.string().min(1, { message: "Recording title is required!" }),
+  recordingUrl: z.string().url({ message: "Valid URL is required!" }),
+  description: z.string().optional(),
+  teacherId: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ClassRecordingSchema = z.infer<typeof classRecordingSchema>;

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
+import { DM } from "@prisma/client"; // Import DM type
 
 // Add proper type for relatedData
 type RelatedData = {
@@ -8,7 +9,7 @@ type RelatedData = {
   subjects?: { id: number; name: string }[];
   grades?: { id: number; level: number }[];
   batches?: { id: number; name: string }[];
-  DM?: { id: string; name: string; surname: string }[];
+  dms?: { id: string; name: string; surname: string }[];
 };
 
 export type FormContainerProps = {
@@ -24,7 +25,8 @@ export type FormContainerProps = {
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
-  relatedData?: DM[];
+  relatedData?: RelatedData;
+
   // Removed 'relatedData' from props
 };
 
@@ -53,7 +55,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         const dms = await prisma.dM.findMany({
           select: { id: true, name: true, surname: true, batches: true },
         });
-        relatedData = { teachers: batchTeachers, grades: batchGrades, DM: dms };
+        relatedData = { teachers: batchTeachers, grades: batchGrades, dms: dms };
         break;
       case "teacher":
         const teacherSubjects = await prisma.subject.findMany({
