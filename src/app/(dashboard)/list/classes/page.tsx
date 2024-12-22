@@ -92,7 +92,7 @@ const renderRow = (item: BatchList) => (
         </Link>
         {(role === "admin" || role === "delivery_manager") && (
           <>
-            <FormContainer table="batch" type="update" data={item} relatedData={dms} />
+            <FormContainer table="batch" type="update" data={item} relatedData={{ dms }} />
             <FormContainer table="batch" type="delete" id={item.id} />
           </>
         )}
@@ -176,7 +176,7 @@ const renderRow = (item: BatchList) => (
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" relatedData={ dms  } />}
+            {(role === "admin" || role === "delivery_manager")  && <FormContainer table="batch" type="create" relatedData={ { dms } } />}
           </div>
         </div>
       </div>
