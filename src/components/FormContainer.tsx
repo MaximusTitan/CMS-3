@@ -24,6 +24,7 @@ export type FormContainerProps = {
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
+  relatedData?: DM[];
   // Removed 'relatedData' from props
 };
 
