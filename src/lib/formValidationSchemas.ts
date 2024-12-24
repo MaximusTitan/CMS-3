@@ -13,11 +13,11 @@ export const batchSchema = z.object({
   name: z.string().min(1, { message: "Batch name is required!" }),
   capacity: z.coerce.number().min(1, { message: "Capacity is required!" }),
   gradeId: z.coerce.number().optional(), // Make gradeId optional
-  supervisorId: z.coerce.string().optional(), // Ensure supervisorId is optional
-  assistantLecturerIds: z.array(z.string()).optional(), // Array of assistant lecturer IDs
-  dmId: z.coerce.string().optional(), // Ensure dmId is correctly defined
-  zoomLink: z.string().url({ message: "Valid Zoom link is required!" }).optional(), // Zoom link (optional)
-  zoomLinkId: z.coerce.number().optional(), // Add zoomLinkId as optional
+  supervisorId: z.coerce.string(), // Make supervisorId required
+  assistantLecturerIds: z.array(z.string()), // Make assistantLecturerIds required
+  dmId: z.coerce.string(), // Make dmId required
+  zoomLink: z.string().url({ message: "Valid Zoom link is required!" }), // Make zoomLink required
+  zoomLinkId: z.coerce.number().optional(), // Make zoomLinkId required
 });
 
 export type BatchSchema = z.infer<typeof batchSchema>;
@@ -168,14 +168,15 @@ export const zoomLinkSchema = z.object({
 export type ZoomLinkSchema = z.infer<typeof zoomLinkSchema>;
 
 export const classRecordingSchema = z.object({
-  id: z.string(),
-  batchId: z.number(),
-  title: z.string().min(1, { message: "Recording title is required!" }),
-  recordingUrl: z.string().url({ message: "Valid URL is required!" }),
+  id: z.string().optional(),
+  batchId: z.coerce.number({
+    required_error: "Batch ID is required",
+    invalid_type_error: "Batch ID must be a number",
+  }),
+  title: z.string().min(1, "Title is required"),
+  recordingUrl: z.string().url("Must be a valid URL"),
   description: z.string().optional(),
-  teacherId: z.string(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
+  teacherId: z.string().min(1, "Teacher ID is required"),
 });
 
 export type ClassRecordingSchema = z.infer<typeof classRecordingSchema>;

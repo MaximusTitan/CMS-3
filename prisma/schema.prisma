@@ -25,27 +25,28 @@ model Student {
   createdAt DateTime @default(now())
   batchId   Int
   batch     Batch    @relation(fields: [batchId], references: [id])
-  gradeId   Int?     // Make gradeId optional
+  gradeId   Int? // Make gradeId optional
   grade     Grade?   @relation(fields: [gradeId], references: [id])
   birthday  DateTime
 }
 
 model Teacher {
-  id                String      @id
-  username          String      @unique
-  name              String
-  surname           String
-  email             String?     @unique
-  phone             String?     @unique
-  address           String
-  img               String?
-  sex               UserSex
-  birthday          DateTime
-  assistantBatches  Batch[]     @relation("BatchAssistantLecturers")
-  subjects          Subject[]
-  createdAt         DateTime    @default(now())
-  lessons           Lesson[]
-  batches           Batch[]
+  id               String           @id
+  username         String           @unique
+  name             String
+  surname          String
+  email            String?          @unique
+  phone            String?          @unique
+  address          String
+  img              String?
+  sex              UserSex
+  birthday         DateTime
+  assistantBatches Batch[]          @relation("BatchAssistantLecturers")
+  subjects         Subject[]
+  createdAt        DateTime         @default(now())
+  lessons          Lesson[]
+  batches          Batch[]
+  ClassRecording   ClassRecording[]
 }
 
 model Grade {
@@ -57,24 +58,24 @@ model Grade {
 }
 
 model Batch {
-  id                 Int             @id @default(autoincrement())
-  name               String          @unique
-  capacity           Int
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  capacity Int
 
   // New fields for assistant lecturers
-  assistantLecturers Teacher[]      @relation("BatchAssistantLecturers")
+  assistantLecturers Teacher[]        @relation("BatchAssistantLecturers")
   supervisorId       String?
-  supervisor         Teacher?       @relation(fields: [supervisorId], references: [id])
+  supervisor         Teacher?         @relation(fields: [supervisorId], references: [id])
   lessons            Lesson[]
   students           Student[]
   events             Event[]
   announcements      Announcement[]
-  DM                 DM?             @relation("DMBatches", fields: [dmId], references: [id])
+  DM                 DM?              @relation("DMBatches", fields: [dmId], references: [id])
   dmId               String?
-  Grade              Grade?         @relation(fields: [gradeId], references: [id])
-  gradeId            Int?           // Make gradeId optional
-  zoomLink           ZoomLink?      @relation("BatchToZoomLink", fields: [zoomLinkId], references: [id])
-  zoomLinkId         Int?           @unique
+  Grade              Grade?           @relation(fields: [gradeId], references: [id])
+  gradeId            Int? // Make gradeId optional
+  zoomLink           ZoomLink?        @relation("BatchToZoomLink", fields: [zoomLinkId], references: [id])
+  zoomLinkId         Int?             @unique
   classRecordings    ClassRecording[]
 }
 
@@ -137,22 +138,23 @@ model DM {
 }
 
 model ZoomLink {
-  id      Int     @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   url     String
-  batch   Batch?  @relation("BatchToZoomLink")
+  batch   Batch? @relation("BatchToZoomLink")
   batchId Int?
 }
 
 model ClassRecording {
-  id          String   @id @default(cuid())
-  batchId     Int      // Changed from String to Int to match Batch.id
-  batch       Batch    @relation(fields: [batchId], references: [id])
-  title       String
+  id           String   @id @default(cuid())
+  batchId      Int
+  batch        Batch    @relation(fields: [batchId], references: [id])
+  title        String
   recordingUrl String
-  description String   @db.Text
-  teacherId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  description  String   @db.Text
+  teacherId    String
+  teacher      Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum UserSex {

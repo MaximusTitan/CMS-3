@@ -10,6 +10,8 @@ import {
   DMSchema,
   batchSchema,
   ZoomLinkSchema,
+  classRecordingSchema,
+  ClassRecordingSchema,
     // Add this import
 } from "./formValidationSchemas";
 import prisma from "./prisma";
@@ -732,5 +734,69 @@ export const deleteLesson = async (prevState: FormState, formData: FormData): Pr
       success: false, 
       error: err instanceof Error ? err.message : "An unknown error occurred" 
     };
+  }
+};
+
+export const createClassRecording = async (
+  currentState: CurrentState,
+  data: ClassRecordingSchema
+) => {
+  try {
+    const validatedData = classRecordingSchema.parse(data);
+    await prisma.classRecording.create({
+      data: {
+        batchId: validatedData.batchId,
+        title: validatedData.title,
+        recordingUrl: validatedData.recordingUrl,
+        description: validatedData.description || "",
+        teacherId: validatedData.teacherId,
+      },
+    });
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error creating class recording:", err);
+    return { success: false, error: true };
+  }
+};
+
+export const updateClassRecording = async (
+  currentState: CurrentState,
+  data: ClassRecordingSchema
+) => {
+  if (!data.id) {
+    return { success: false, error: true };
+  }
+  try {
+    const validatedData = classRecordingSchema.parse(data);
+    await prisma.classRecording.update({
+      where: { id: data.id },
+      data: {
+        batchId: validatedData.batchId,
+        title: validatedData.title,
+        recordingUrl: validatedData.recordingUrl,
+        description: validatedData.description,
+        teacherId: validatedData.teacherId,
+      },
+    });
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error updating class recording:", err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteClassRecording = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.classRecording.delete({
+      where: { id },
+    });
+    return { success: true, error: false };
+  } catch (err) {
+    console.error("Error deleting class recording:", err);
+    return { success: false, error: true };
   }
 };

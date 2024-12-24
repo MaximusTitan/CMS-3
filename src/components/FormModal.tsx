@@ -8,6 +8,9 @@ import {
   deleteTeacher,
   deleteDM,
   deleteLesson,
+  deleteClassRecording,
+  createClassRecording,
+  updateClassRecording,
 } from "@/lib/actions";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -16,18 +19,20 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { FormContainerProps } from "./FormContainer";
+// import ClassRecordingForm from "./forms/ClassRecordingForm";
 
 const deleteActionMap = {
   subject: deleteSubject,
   batch: deleteBatch,
   teacher: deleteTeacher,
   student: deleteStudent,
-  DM:deleteDM,
-// TODO: OTHER DELETE ACTIONS
+  DM: deleteDM,
+  // TODO: OTHER DELETE ACTIONS
 
   lesson: deleteLesson,
   event: deleteSubject,
   announcement: deleteAnnouncement,
+  classRecording: deleteClassRecording,
 };
 
 // USE LAZY LOADING
@@ -54,6 +59,9 @@ const DMForm = dynamic(() => import("./forms/DMForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const LessonForm = dynamic(() => import("./forms/LessonForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const ClassRecordingForm = dynamic(() => import("./forms/ClassRecordingForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 // TODO: OTHER FORMS
@@ -107,7 +115,6 @@ const forms: {
     />
   ),
 
- 
   DM: (setOpen, type, data, relatedData) => (
     <DMForm
       type={type}
@@ -125,8 +132,15 @@ const forms: {
       relatedData={relatedData}
     />
   ),
- 
-    // TODO OTHER LIST ITEMS
+  classRecording: (setOpen, type, data, relatedData) => (
+    <ClassRecordingForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  // TODO OTHER LIST ITEMS
 };
 
 const FormModal = ({

@@ -21,7 +21,8 @@ export type FormContainerProps = {
     | "lesson"
     | "event"
     | "DM"
-    | "announcement";
+    | "announcement"
+    | "classRecording"; // Added
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
@@ -108,6 +109,16 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
             select: { id: true, name: true },
           });
           relatedData = { batches: eventBatches };
+          break;
+
+        case "classRecording":
+          const classRecordingBatches = await prisma.batch.findMany({
+            select: { id: true, name: true },
+          });
+          const classRecordingTeachers = await prisma.teacher.findMany({
+            select: { id: true, name: true, surname: true },
+          });
+          relatedData = { batches: classRecordingBatches, teachers: classRecordingTeachers };
           break;
       
       default:
