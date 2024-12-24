@@ -66,9 +66,9 @@ const ClassForm = ({
       const cleanedData = {
         ...formData,
         gradeId: formData.gradeId || undefined,
-        supervisorId: formData.supervisorId || undefined,
-        dmId: formData.dmId || undefined,
-        zoomLink: formData.zoomLink || undefined,
+        supervisorId: formData.supervisorId,
+        dmId: formData.dmId || "", // Changed from undefined to an empty string
+        zoomLink: formData.zoomLink || "", // Changed from undefined to an empty string
         assistantLecturerIds: formData.assistantLecturerIds || [],
       };
 
