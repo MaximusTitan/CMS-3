@@ -27,9 +27,9 @@ const TeacherPage = async () => {
             <div key={batch.id} className="mt-4">
               <h2 className="text-lg font-medium">{batch.name}</h2>
               <a href={batch.zoomLinkId?.toString()} target="_blank" rel="noopener noreferrer">
-                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+                {/* <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
                   Join Zoom Meeting
-                </button>
+                </button> */}
               </a>
             </div>
           ))}
