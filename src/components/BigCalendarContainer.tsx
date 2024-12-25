@@ -7,12 +7,12 @@ const BigCalendarContainer = async ({
   id,
 }: {
   type: "teacherId" | "batchId";
-  id: string | number;
+  id: string ;
 }) => {
   const dataRes = await prisma.lesson.findMany({
     where: {
       ...(type === "teacherId"
-        ? { teacherId: id.toString() }
+        ? { teacherId: id }
         : { batchId: parseInt(id.toString()) }),
     },
   });
