@@ -23,16 +23,16 @@ const TeacherPage = async () => {
       <div className="w-full xl:w-2/3">
         <div className="h-full bg-white p-4 rounded-md">
           <h1 className="text-xl font-semibold">Schedule</h1>
-          {batches.map((batch) => (
-            // <div key={batch.id} className="mt-4">
-            //   <h2 className="text-lg font-medium">{batch.name}</h2>
-            //   <a href={batch.zoomLinkId?.toString()} target="_blank" rel="noopener noreferrer">
-            //     <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
-            //       Join Zoom Meeting
-            //     </button>
-            //   </a>
-            // </div>
-          ))}
+          {/* {batches.map((batch) => (
+            <div key={batch.id} className="mt-4">
+              <h2 className="text-lg font-medium">{batch.name}</h2>
+              <a href={batch.zoomLinkId?.toString()} target="_blank" rel="noopener noreferrer">
+                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+                  Join Zoom Meeting
+                </button>
+              </a>
+            </div>
+          ))} */}
           <BigCalendarContainer type="teacherId" id={batches[0]?.id} />
         </div>
       </div>
