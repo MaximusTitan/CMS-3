@@ -148,7 +148,7 @@ const SingleDMPage = async ({
         {/* BOTTOM */}
         <div className="mt-4 bg-white rounded-md p-4 h-[800px]">
           <h1>Delivery Manager&apos;s Schedule</h1>
-          <BigCalendarContainer type="batchId" id={dm.id} />
+          <BigCalendarContainer type="batchId" id={dm.id.valueOf()} />
         </div>
       </div>
       {/* RIGHT */}

@@ -31,7 +31,7 @@ const StudentPage = async () => {
               </a>
             </div>
           ))}
-          <BigCalendarContainer type="batchId" id={batches[0]?.id} />
+          <BigCalendarContainer type="batchId" id={batches[0]?.id.toFixed()} />
         </div>
       </div>
       {/* RIGHT */}
