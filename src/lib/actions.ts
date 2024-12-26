@@ -178,7 +178,7 @@ export async function updateBatch(
         data: {
           name: data.name,
           capacity: data.capacity,
-          Grade: { connect: { id: data.gradeId } },
+          ...(data.gradeId && { Grade: { connect: { id: data.gradeId } } }),
           supervisor: data.supervisorId
             ? { connect: { id: data.supervisorId } }
             : undefined,

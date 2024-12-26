@@ -10,15 +10,16 @@ const BigCalendarContainer = async ({
   id: string ;
 }) => {
   const dataRes = await prisma.lesson.findMany({
+    include: { batch: true },
     where: {
       ...(type === "teacherId"
         ? { teacherId: id }
-        : { batchId: parseInt(id) }),
+        : { batchId: Number(id) }),
     },
   });
 
   const data = dataRes.map((lesson) => ({
-    title: lesson.name,
+    title: `${lesson.batch?.name} - ${lesson.name}`,
     start: lesson.startTime,
     end: lesson.endTime,
 
