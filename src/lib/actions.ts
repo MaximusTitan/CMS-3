@@ -12,11 +12,11 @@ import {
   ZoomLinkSchema,
   classRecordingSchema,
   ClassRecordingSchema,
-    // Add this import
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { clerkClient } from "@clerk/nextjs/server";
 import { DM } from "@prisma/client"; // Import DM type
+import nodemailer from "nodemailer"; // Import nodemailer
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -548,7 +548,7 @@ export const createAnnouncement = async (
   data: AnnouncementSchema
 ) => {
   try {
-    await prisma.announcement.create({
+    const announcement = await prisma.announcement.create({
       data: {
         title: data.title,
         description: data.description, 
@@ -560,6 +560,44 @@ export const createAnnouncement = async (
           : undefined, 
       },
     });
+
+    // Fetch batch members
+    const batch = await prisma.batch.findUnique({
+      where: { id: data.batchId },
+      include: {
+        students: true,
+        assistantLecturers: true,
+        supervisor: true,
+        DM: true,
+      },
+    });
+
+    if (batch) {
+      const emails = [
+        ...batch.students.map(student => student.email).filter((email): email is string => !!email),
+        ...batch.assistantLecturers.map(teacher => teacher.email).filter((email): email is string => !!email),
+        batch.supervisor?.email,
+        batch.DM?.email,
+      ].filter((email): email is string => !!email);
+
+      // Send emails
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emails,
+        subject: data.title, // Use title as the subject
+        text: data.description,
+      };
+
+      await transporter.sendMail(mailOptions);
+    }
 
     // Uncomment if needed to revalidate paths
     // revalidatePath("/list/announcements");
