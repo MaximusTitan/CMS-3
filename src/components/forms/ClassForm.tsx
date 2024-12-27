@@ -102,9 +102,8 @@ const ClassForm = ({
         setValue("gradeId", data.gradeId);
       }
       setValue("supervisorId", data.supervisorId);
-      // Update to handle DM data correctly
       setValue("dmId", data.DM?.id || data.dmId || "");
-      setValue("zoomLink", data?.zoomLink?.url);
+      setValue("zoomLink", data.zoomLink?.url || ""); // Ensure zoomLink is set correctly
       setValue("assistantLecturerIds", 
         data.assistantLecturers?.map((t: any) => t.id) || []
       );

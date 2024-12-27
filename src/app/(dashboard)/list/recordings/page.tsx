@@ -25,9 +25,26 @@ export default async function RecordingsPage({
 
   // If admin, no filter; else add your user-specific logic
   const whereClause = role !== "admin"
-    ? {
-        // ...additional filtering logic if needed...
-      }
+    ? role === "student"
+      ? {
+          students: {
+            some: {
+              id: sessionClaims?.sub,
+            },
+          },
+        }
+      : role === "teacher"
+        ? {
+            OR: [
+              { supervisorId: sessionClaims?.sub },
+              {
+                assistantLecturers: {
+                  some: { id: sessionClaims?.sub },
+                },
+              },
+            ],
+          }
+        : {}
     : {};
 
   const [data, totalCount] = await prisma.$transaction([

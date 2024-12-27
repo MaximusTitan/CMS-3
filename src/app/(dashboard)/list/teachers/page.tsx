@@ -32,27 +32,27 @@ const TeacherListPage = async ({
     {
       header: "Teacher ID",
       accessor: "teacherId",
-      className: "hidden md:table-cell",
+      className: "hidden md:table-cell px-6",
     },
     {
       header: "Courses",
       accessor: "subjects",
-      className: "hidden md:table-cell",
+      className: "hidden md:table-cell px-6",
     },
     {
       header: "Batches",
       accessor: "batches",
-      className: "hidden md:table-cell",
+      className: "hidden md:table-cell px-6",
     },
     {
       header: "Phone",
       accessor: "phone",
-      className: "hidden lg:table-cell",
+      className: "hidden lg:table-cell px-6",
     },
     {
       header: "Address",
       accessor: "address",
-      className: "hidden lg:table-cell",
+      className: "hidden lg:table-cell px-6",
     },
     ...((role === "admin" || role === "delivery_manager")
       ? [
@@ -83,18 +83,18 @@ const TeacherListPage = async ({
           <p className="text-xs text-gray-500">{item?.email}</p>
         </div>
       </td>
-      <td className="hidden md:table-cell">{item.username}</td>
-      <td className="hidden md:table-cell">
+      <td className="hidden md:table-cell px-6">{item.username}</td>
+      <td className="hidden md:table-cell px-6">
         {item.subjects.map((subject) => subject.name).join(",")}
       </td>
-      <td className="hidden md:table-cell">
+      <td className="hidden md:table-cell px-6">
         {[
           ...item.batches.map(batch => `${batch.name} (Supervisor)`),
           ...item.assistantBatches.map(batch => `${batch.name} (Assistant)`)
         ].join(", ")}
       </td>
-      <td className="hidden md:table-cell">{item.phone}</td>
-      <td className="hidden md:table-cell">{item.address}</td>
+      <td className="hidden md:table-cell px-6">{item.phone}</td>
+      <td className="hidden md:table-cell px-6">{item.address}</td>
       <td>
         <div className="flex items-center gap-2">
           <Link href={`/list/teachers/${item.id}`}>
@@ -103,10 +103,10 @@ const TeacherListPage = async ({
             </button>
           </Link>
           {(role === "admin"  || role === "delivery_manager") && (
-            // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
-            //   <Image src="/delete.png" alt="" width={16} height={16} />
-            // </button>
-            <FormContainer table="teacher" type="delete" id={item.id} />
+            <>
+              <FormContainer table="teacher" type="update" id={item.id} data={item} />
+              <FormContainer table="teacher" type="delete" id={item.id} />
+            </>
           )}
         </div>
       </td>

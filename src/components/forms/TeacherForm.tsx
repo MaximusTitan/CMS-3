@@ -27,6 +27,7 @@ const TeacherForm = ({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<TeacherSchema>({
     resolver: zodResolver(teacherSchema),
   });
@@ -55,6 +56,20 @@ const TeacherForm = ({
       router.refresh();
     }
   }, [state, router, type, setOpen]);
+
+  useEffect(() => {
+    if (data) {
+      setValue("username", data.username);
+      setValue("email", data.email);
+      setValue("name", data.name);
+      setValue("surname", data.surname);
+      setValue("phone", data.phone);
+      setValue("address", data.address);
+      setValue("birthday", data.birthday.toISOString().split("T")[0]);
+      setValue("sex", data.sex);
+      setValue("subjects", data.subjects.map((subject: any) => subject.id));
+    }
+  }, [data, setValue]);
 
   const { subjects } = relatedData;
 

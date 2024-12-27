@@ -37,6 +37,7 @@ const StudentForm = ({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<StudentSchema>({
     resolver: zodResolver(studentSchema),
   });
@@ -66,6 +67,21 @@ const StudentForm = ({
       router.refresh();
     }
   }, [state, router, type, setOpen]);
+
+  useEffect(() => {
+    if (data) {
+      setValue("username", data.username);
+      setValue("email", data.email);
+      setValue("name", data.name);
+      setValue("surname", data.surname);
+      setValue("phone", data.phone);
+      setValue("address", data.address);
+      setValue("birthday", data.birthday.toISOString().split("T")[0]);
+      setValue("sex", data.sex);
+      setValue("gradeId", data.gradeId);
+      setValue("batchId", data.batchId);
+    }
+  }, [data, setValue]);
 
   const { grades = [], batches = [] } = relatedData || {};
 
