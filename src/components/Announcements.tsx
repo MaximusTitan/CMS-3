@@ -8,6 +8,7 @@ const Announcements = async () => {
   const roleConditions = {
     teacher: { lessons: { some: { teacherId: userId! } } },
     student: { students: { some: { id: userId! } } },
+    dm: { DM: { some: { id: userId! } } as any }, // Add condition for DMs
   };
 
   const data = await prisma.announcement.findMany({
@@ -69,4 +70,3 @@ const Announcements = async () => {
 };
 
 export default Announcements;
-//change 1
