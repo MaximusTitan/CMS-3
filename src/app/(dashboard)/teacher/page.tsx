@@ -34,8 +34,9 @@ const TeacherPage = async () => {
               </a>
             </div>
           ))}
+          {/* Check if the teacher is a supervisor or assistant lecturer */}
           <BigCalendarContainer
-            type="teacherId"
+            type={batches.some(batch => batch.supervisorId === userId) ? "teacherId" : "assistantLecturerId"}
             id={userId!}
           />
         </div>

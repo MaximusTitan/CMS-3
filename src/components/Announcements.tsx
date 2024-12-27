@@ -6,21 +6,22 @@ const Announcements = async () => {
   const role = (sessionClaims?.metadata as { role?: string })?.role;
 
   const roleConditions = {
-    teacher: { lessons: { some: { teacherId: userId! } } },
+    teacher: { 
+      OR: [
+        { supervisorId: userId! },
+        { assistantLecturers: { some: { id: userId! } } }
+      ]
+    },
     student: { students: { some: { id: userId! } } },
-    dm: { DM: { some: { id: userId! } } as any }, // Add condition for DMs
+    dm: { dmId: userId! },
+    assistantLecturer: { assistantLecturers: { some: { id: userId! } } },
   };
 
   const data = await prisma.announcement.findMany({
     take: 3,
     orderBy: { date: "desc" },
     where: {
-      ...(role !== "admin" && {
-        OR: [
-          { batchId: null },
-          { batch: roleConditions[role as keyof typeof roleConditions] || {} },
-        ],
-      }),
+      batch: role !== "admin" ? roleConditions[role as keyof typeof roleConditions] : undefined,
     },
   });
 
@@ -70,4 +71,3 @@ const Announcements = async () => {
 };
 
 export default Announcements;
-// Added env variables to the project
