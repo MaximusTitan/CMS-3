@@ -27,7 +27,6 @@ const ClassForm = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
   relatedData: {
     teachers: any[];
-    grades: any[];
     dms: any[];
   };
 }) => {
@@ -65,7 +64,6 @@ const ClassForm = ({
       // Transform empty strings to undefined for optional fields
       const cleanedData = {
         ...formData,
-        gradeId: formData.gradeId || undefined,
         supervisorId: formData.supervisorId,
         dmId: formData.dmId || "", // Changed from undefined to an empty string
         zoomLink: formData.zoomLink || "", // Changed from undefined to an empty string
@@ -98,9 +96,6 @@ const ClassForm = ({
     if (data) {
       setValue("name", data.name);
       setValue("capacity", data.capacity);
-      if (data.gradeId) {
-        setValue("gradeId", data.gradeId);
-      }
       setValue("supervisorId", data.supervisorId);
       setValue("dmId", data.DM?.id || data.dmId || "");
       setValue("zoomLink", data.zoomLink?.url || ""); // Ensure zoomLink is set correctly
@@ -110,7 +105,7 @@ const ClassForm = ({
     }
   }, [data, setValue]);
 
-  const { teachers, grades, dms } = relatedData;
+  const { teachers, dms } = relatedData;
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -200,29 +195,7 @@ const ClassForm = ({
           )}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Grade</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("gradeId")}
-            defaultValue={data?.gradeId || ""}
-          >
-            <option value="">Select Grade</option>
-            {grades.map((grade: { id: number; level: number }) => (
-              <option
-                value={grade.id}
-                key={grade.id}
-              >
-                {grade.level}
-              </option>
-            ))}
-          </select>
-          {formState.errors.gradeId?.message && ( // Update reference to formState.errors
-            <p className="text-xs text-red-400">
-              {formState.errors.gradeId.message.toString()}
-            </p>
-          )}
-        </div>
+        {/* Removed grade selection div here */}
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label className="text-xs text-gray-500">Delivery Manager</label>
