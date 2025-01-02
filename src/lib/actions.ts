@@ -561,7 +561,7 @@ export const createAnnouncement = async (
       },
     });
 
-    // Fetch batch members
+    // Fetch batch members along with course name
     const batch = await prisma.batch.findUnique({
       where: { id: data.batchId },
       include: {
@@ -569,6 +569,7 @@ export const createAnnouncement = async (
         assistantLecturers: true,
         supervisor: true,
         DM: true,
+        
       },
     });
 
@@ -580,7 +581,7 @@ export const createAnnouncement = async (
         batch.DM?.email,
       ].filter((email): email is string => !!email);
 
-      // Send emails
+      // Send emails with additional information
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -593,7 +594,9 @@ export const createAnnouncement = async (
         from: process.env.EMAIL_USER,
         to: emails,
         subject: data.title, // Use title as the subject
-        text: data.description,
+        text: `Batch Name: ${batch.name}
+        Date: ${new Intl.DateTimeFormat("en-GB").format(data.date)}
+        Description: ${data.description}`,
       };
 
       await transporter.sendMail(mailOptions);
